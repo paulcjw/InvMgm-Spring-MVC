@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<title>Inventory Form</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+</script>
+<script>
+$(document).ready(function () 
+		{
+			$("#ddlselect").on("keyup", function (event) 
+					{
+						var product = $("#ddlselect").val();
+						if(product != "0")
+							{	
+		    					$.ajax(
+		    						{
+		      							type : "POST",
+		      							url :  "/inventory/getProduct/" + product,
+		      							traditional: true,
+		      							data: { text: product },
+		      							success: successFunc
+		    						});
+		
+		    				function successFunc(data)
+		    					{
+	    	  						$("#pdt_price").val(data[0]);
+	    	  						$("#pdt_name").val(data[1]);
+		    					}
+	    					}
+						else if (product == null)
+							{
+	    						$("#pdt_price").val("");
+	    						$("#pdt_name").val("");
+	    						return
+	    					}
+						else
+						{
+    						$("#pdt_price").val("");
+    						$("#pdt_name").val("");
+    						return
+    					}
+	  				});
+			$("#ddlselect1").on("click", function (event)
+					{
+				var supplier = $("#ddlselect1").val();
+				if(supplier != "0")
+					{	
+    					$.ajax(
+    						{
+      							type : "POST",
+      							url :  "/inventory/getSupplier/" + supplier,
+      							traditional: true,
+      							data: { text: supplier },
+      							success: successFunc
+    						});
+
+    				function successFunc(data)
+    					{
+	  						$("#sup_id").val(data[0]);
+	  						/* $("#sup_name").val(data[1]); */
+    					}
+					}
+				else
+					{
+						$("#sup_id").val("");
+						/* $("#sup_name").val(""); */
+						return
+					}
+				});
+		});
+</script>
+</head>
+<body>
+
+	<header th:insert="fragments/general.html :: header"> </header>
+	<div th:replace="fragments/general.html :: menu"></div>
+
+	<h1>Inventory Form</h1>
+	<h3>Checking</h3>
+	Product Name<input type="text" id="ddlselect"></input>
+	
+	
+	Part Number<input type="text" readonly="readonly" id="pdt_name"/>
+	Unit Price<input type="text" readonly="readonly" id="pdt_price"/>
+	
+	<p>Supplier Name<select id="ddlselect1">
+	<option value="0">--Select--</option>
+	<option th:each="supplier:${suppliers}" th:value="${supplier.supplierId}"
+					th:text="${supplier.supplierName}"></option>
+	</select>
+	Supplier Id<input type="text" readonly="readonly" id="sup_id"/>
+	<!-- Unit Price<input type="text" readonly="readonly" id="sup_name"/> -->
+	
+	</p>
+	<h3>Form</h3>
+	<form action="#" th:object="${inventory}" th:action="@{/inventory/save}"
+		method="post">
+		<fieldset>
+			<input type="hidden" th:field="*{inventoryId}">
+		</fieldset>
+		<fieldset>
+			Part Number <select th:field="*{product.partNumber}">
+				<option th:each="product:${products}" th:value="${product.partNumber}"
+					th:text="${product.partNumber}"></option>
+			</select>
+		</fieldset>
+		<fieldset>
+			Supplier ID <select th:field="*{supplier.supplierId}">
+				<option th:each="supplier:${suppliers}" th:value="${supplier.supplierId}"
+					th:text="${supplier.supplierId}"></option>
+			</select>
+		</fieldset> 
+		 <!-- <fieldset>
+			Supplier Name <input type="text" th:field="*{supplierName}">
+			<p th:if="${#fields.hasErrors('supplierName')}"
+				th:errors="*{supplierName}"></p>
+		</fieldset> -->
+		<!-- <fieldset>
+			Brand Id <input type="number" step=1 th:field="*{brandId}">
+			<p style="color:red" th:if="${#fields.hasErrors('brandId')}" th:errors="*{brandId}"></p>
+		</fieldset> -->
+
+		<fieldset>
+			Brand Name <input type="text" th:field="*{brandName}">
+			<p style="color:red" th:if="${#fields.hasErrors('brandName')}" th:errors="*{brandName}"></p>
+		</fieldset>
+		<!-- <fieldset>
+			Item Name <input type="text" th:field="*{itemName}" >
+			<p th:if="${#fields.hasErrors('itemName')}" th:errors="*{itemName}"></p>
+		</fieldset> -->
+		<fieldset>
+			Description <input type="text" th:field="*{invdescription}">
+			<p style="color:red" th:if="${#fields.hasErrors('invdescription')}" th:errors="*{invdescription}"></p>
+		</fieldset>
+		<fieldset>
+			Type <input type="text" th:field="*{invtype}">
+			<p style="color:red" th:if="${#fields.hasErrors('invtype')}" th:errors="*{invtype}"></p>
+		</fieldset>
+		<fieldset>
+			Category <input type="text" th:field="*{category}">
+			<p style="color:red" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></p>
+		</fieldset>
+		<fieldset>
+			Subcategory <input type="text" th:field="*{subCategory}">
+			<p style="color:red" th:if="${#fields.hasErrors('subCategory')}" th:errors="*{subCategory}"></p>
+		</fieldset>
+		<fieldset>
+			Original Price <input type="number" step=0.01  th:field="*{originalPrice}">
+			<p style="color:red" th:if="${#fields.hasErrors('originalPrice')}" th:errors="*{originalPrice}"></p>
+		</fieldset>
+		<fieldset>
+			Whole Price <input type="number" step=0.01  th:field="*{wholesalePrice}">
+			<p style="color:red" th:if="${#fields.hasErrors('wholesalePrice')}" th:errors="*{wholesalePrice}"></p>
+		</fieldset>
+		<fieldset>
+			Retail Price <input type="number" step=0.01  th:field="*{retailPrice}">
+			<p style="color:red" th:if="${#fields.hasErrors('retailPrice')}" th:errors="*{retailPrice}"></p>
+		</fieldset>
+		<fieldset>
+			Partner Price <input type="number" step=0.01  th:field="*{partnerPrice}">
+			<p style="color:red" th:if="${#fields.hasErrors('partnerPrice')}" th:errors="*{partnerPrice}"></p>
+		</fieldset>
+		<fieldset>
+			Units <input type="number" step=1 th:field="*{units}">
+			<p style="color:red" th:if="${#fields.hasErrors('units')}" th:errors="*{units}"></p>
+		</fieldset> 
+		
+		<fieldset>
+			<input type="submit" value="Save" /> &nbsp; &nbsp; 
+			<input type="button" value="Reset" onclick="window.location.href='/inventory/add'; return false" />
+		</fieldset>
+
+	</form> 
+	
+	<h1 style="color:red" th:text=${message}></h1>
+	<br />
+	<div th:replace="fragments/general.html :: footer"></div>
+
+</body>
+</html>
